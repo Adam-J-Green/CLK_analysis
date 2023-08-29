@@ -8,10 +8,10 @@ import seaborn as sns
 from scipy import stats
 import re
 import streamlit as st
+import openpyxl
 
-def preprocess():
-  general_data = pd.read_csv("Copy of Copy of Quest 2 Data Tracking - LM Edits 2.9.23 - Copy.csv")
-
+def preprocess(file):
+  general_data = pd.read_csv(file)
   staff = []
   comments = []
   for col in general_data.columns:
@@ -61,12 +61,10 @@ def preprocess():
   'Leader Behaviour & Interactions', 'Program Characteristics & Support','QUEST 2 Total Score']]
 
   general_data.columns.str.lower()
-  general_data.to_csv("general_data.csv")
-
-preprocess()
-
+  #general_data.to_csv('general_data.csv')
+  return general_data
 
 
-
+preprocess('Copy of Copy of Quest 2 Data Tracking - LM Edits 2.9.23 - Copy.csv')
 
 

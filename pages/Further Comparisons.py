@@ -6,7 +6,9 @@ import matplotlib.pyplot as plt
 import plotly.express as plotl
 import seaborn as sns
 from datetime import datetime
-data = pd.read_csv('general_data.csv')
+import Main_page
+
+data = Main_page.gen_data('tester.csv')
 
 std_vals = {'Leader/Child Interactions': 108.36, 'Supervision & Safety':64.8, 'Child/Child Interactions':48.24, 'Leader Behaviour & Interactions':34.02, 'Program Characteristics & Support':72, 'QUEST 2 Total Score':327.42}
 

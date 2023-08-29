@@ -13,6 +13,7 @@ from sklearn import preprocessing
 from sklearn.tree import DecisionTreeClassifier
 import numpy as np
 from random import choices
+import Main_page
 
 colours = ['blue', 'orange', 'green', 'red', 'yellow', 'pink']
 
@@ -21,11 +22,8 @@ st.markdown(""" <style> .font {
 font-size:50px;} 
 </style> """, unsafe_allow_html=True)
 
-@st.cache_data
-def gen_data(csv):
-    return pd.read_csv(csv)
 
-data = gen_data('general_data.csv')
+data = Main_page.gen_data('tester.csv')
 lin_reg_data = data.iloc[:, [3,5,6,7,8,9,10,11,12,47,48,49,50,51,52]]
 
 def arrange_lin_model(data):
@@ -130,7 +128,7 @@ if len(uniques) == 2:
     cat2 = booted_data[booted_data['ind'] == uniques[1]]
     ttest_stat, ttest_pval = sp.ttest_ind(list(cat1['means']), list(cat2['means']))
     ind = ["a difference" if ttest_pval <0.05 else 'no difference']
-    st.text(f"Test for difference of means between groups returned pvalue: {round(ttest_pval, 3)} meaning there is {round(ind[0], 3)}")
+    st.text(f"Test for difference of means between groups returned pvalue: {round(int(ttest_pval), 3)} meaning there is {round(int(ind[0]), 3)}")
 if len(uniques) == 3:
     lists = []
     grouped = booted_data.groupby('ind')
@@ -142,7 +140,7 @@ if len(uniques) == 3:
     l1,l2,l3 = map(list, zip(*lists))
     stat, pval = sp.f_oneway(l1,l2,l3)
     ind = ["a difference" if pval <0.05 else 'no difference']
-    st.text(f"Test for difference of means between groups returned pvalue: {round(pval, 3)} meaning there is {round(ind[0], 3)}")
+    st.text(f"Test for difference of means between groups returned pvalue: {round(int(pval), 3)} meaning there is {round(int(ind[0]), 3)}")
 if len(uniques) == 4:
     lists = []
     grouped = booted_data.groupby('ind')
@@ -154,7 +152,7 @@ if len(uniques) == 4:
     l1,l2,l3,l4 = map(list, zip(*lists))
     stat, pval = sp.f_oneway(l1,l2,l3,l4)
     ind = ["a difference" if pval <0.05 else 'no difference']
-    st.text(f"Test for difference of means between groups returned pvalue: {round(pval, 3)} meaning there is {round(ind[0], 3)}")
+    st.text(f"Test for difference of means between groups returned pvalue: {round(int(pval), 3)} meaning there is {round(int(ind[0]), 3)}")
 if len(uniques) == 5:
     lists = []
     grouped = booted_data.groupby('ind')
@@ -166,7 +164,7 @@ if len(uniques) == 5:
     l1,l2,l3,l4,l5 = map(list, zip(*lists))
     stat, pval = sp.f_oneway(l1,l2,l3,l4,l5)
     ind = ["a difference" if pval <0.05 else 'no difference']
-    st.text(f"Test for difference of means between groups returned pvalue: {round(pval, 3)} meaning there is {round(ind[0], 3)}")
+    st.text(f"Test for difference of means between groups returned pvalue: {round(int(pval), 3)} meaning there is {round(int(ind[0]), 3)}")
 
 fig = plt.figure()
 sns.violinplot(data = booted_data, x = 'means', y= 'ind', orient='h')
@@ -179,11 +177,10 @@ st.divider()
 for col in score_cols:
     data[col] = data[col] /std_vals[col]
 
-
 dfs = []
 for i in score_cols:
-    sub_data = data[data[i]]
-    dfs.append()
+    sub_data = data[i]
+    dfs.append(sub_data)
 
 sns.violinplot(data = data, x = 'means', y = '')
 fig = plt.figure()
