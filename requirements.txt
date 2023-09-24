@@ -210,8 +210,6 @@ tensorboard-data-server==0.7.0
 tensorboard-plugin-wit==1.8.1
 tensorflow==2.12.0
 tensorflow-estimator==2.12.0
-tensorflow-intel==2.12.0
-tensorflow-io-gcs-filesystem==0.29.0
 termcolor==2.2.0
 terminado==0.17.1
 TextGrid==1.5
@@ -220,15 +218,12 @@ tiktoken==0.3.3
 tinycss2==1.2.1
 tokenizers==0.13.2
 torch==2.0.1
-torchaudio==2.0.2
 tornado==6.2
 tqdm==4.64.1
 traitlets==5.8.1
 transformers==4.26.1
 trio==0.22.0
 trio-websocket==0.10.2
-typing_extensions==4.4.0
-tzdata==2023.3
 tzlocal==4.3
 uri-template==1.2.0
 uritemplate==4.1.1
@@ -243,8 +238,6 @@ Werkzeug==2.2.2
 widgetsnbextension==4.0.5
 wikipedia==1.4.0
 wrapt==1.14.1
-wsproto==1.2.0
-xxhash==3.2.0
 yarl==1.8.2
 yfinance==0.2.11
 zipp==3.15.0
