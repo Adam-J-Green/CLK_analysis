@@ -23,7 +23,7 @@ font-size:50px;}
 </style> """, unsafe_allow_html=True)
 
 
-data = Main_page.gen_data('tester.csv')
+data = pd.read_csv('tester.csv')
 lin_reg_data = data.iloc[:, [3,5,6,7,8,9,10,11,12,47,48,49,50,51,52]]
 
 def arrange_lin_model(data):
@@ -56,28 +56,37 @@ def arrange_dec_tree(data):
     response = st.selectbox(label = "Select response variable for Decision Tree", options = lin_reg_data.columns[-6:])
     mean = data[response].mean()
     data['ind'] = np.where(data[response]>mean, 1, 0)
+    for col in data.columns:
+        if data[col].dtype == 'object':
+            data[col] = data[col].str.lower()
     col1, col2 = st.columns([1,1])
     with col1:
-        Assessor = st.text_input('Input Assessor Name')
-        Type = st.text_input('Input Program Type')
-        Age = st.text_input('Input Participant Age')
+        Assessor = st.text_input('Input Assessor Name').lower()
+        Type = st.text_input('Input Program Type').lower()
+        Age = st.text_input('Input Participant Age').lower()
     with col2:
-        Supervisor = st.text_input('Input Supervisor Name')
-        num_child = st.text_input('Input Number of Children')
-        num_super = st.text_input('Input Number of Staff/Volunteers')
-
+        Supervisor = st.text_input('Input Supervisor Name').lower()
+        num_child = st.text_input('Input Number of Children').lower()
+        num_super = st.text_input('Input Number of Staff/Volunteers').lower()
     new_dict = {'Assessor Name':Assessor, 'Program Type':Type, 'Participant Age':Age, 
                 'Program Supervisor Name':Supervisor, 'Total Number of Children in Program':num_child, 'Total Number of Staff/Volunteers in Program':num_super}
     df2 = data.append(new_dict, ignore_index = True)
     response = data['ind']
-    feats = df2[['Assessor Name', 'Program Type', 'Participant Age', 'Program Supervisor Name', 'Total Number of Children in Program', 'Total Number of Staff/Volunteers in Program']]
-    encoded_data = pd.get_dummies(feats)
+    #feats = df2[['Assessor Name', 'Program Type', 'Participant Age', 'Program Supervisor Name', 'Total Number of Children in Program', 'Total Number of Staff/Volunteers in Program']]
+    cat_cols = df2[['Assessor Name', 'Program Type', 'Participant Age', 'Program Supervisor Name']]
+    encoded_data = pd.get_dummies(cat_cols)
+    encoded_data['Total Number of Children in Program'] = df2['Total Number of Children in Program']
+    encoded_data['Total Number of Staff/Volunteers in Program'] = df2['Total Number of Staff/Volunteers in Program']
     new_data = encoded_data.iloc[-1]
     encoded_data = encoded_data.iloc[0:-1]
     dect = DecisionTreeClassifier()
     dect.fit(X = encoded_data, y = response)
-    preds = dect.predict_proba([new_data])
-    st.write("Predicted Probability:",preds[:,1][-1]*100)
+    try:
+        preds = dect.predict_proba([new_data])
+        st.write("Predicted Probability:",preds[:,1][-1]*100)
+    except:
+        pass
+    
 
 
 col1, col2 = st.columns([1,1])
@@ -106,10 +115,11 @@ def bootstrap_dat(data):
         df = pd.DataFrame(means)
         df['ind'] = str(uni)
         dfs_list.append(df)
-    return pd.concat(dfs_list), arrays_list, uniques, indicator_var
+    return pd.concat(dfs_list), arrays_list, uniques, indicator_var, cat_var
 
 boot_strap_data = data.iloc[:, [3,5,6,7,8,9,12,47,48,49,50,51,52]]
-booted_data, array_list, uniques, indic= bootstrap_dat(boot_strap_data)
+booted_data, array_list, uniques, indic, cat_var= bootstrap_dat(boot_strap_data)
+
 if len(array_list) == 2:
     krusk = sp.kruskal(array_list[0], array_list[1])
     ind = ['no difference' if krusk.pvalue>0.05 else 'a difference']
@@ -123,12 +133,13 @@ elif len(array_list) == 4:
     ind = ['no difference' if krusk.pvalue>0.05 else 'a difference']
     st.text(f'Kruskal-Wallis testing difference in {indic} between {uniques[0]}, {uniques[1]}, {uniques[2]} and {uniques[3]} returns pvalue: {krusk.pvalue}\n meaning there is {ind[0]} between groups')
 
-if len(uniques) == 2:
+
+if len(uniques) == 2 and cat_var != 'Assessment Year':
     cat1 = booted_data[booted_data['ind'] == uniques[0]]
     cat2 = booted_data[booted_data['ind'] == uniques[1]]
     ttest_stat, ttest_pval = sp.ttest_ind(list(cat1['means']), list(cat2['means']))
     ind = ["a difference" if ttest_pval <0.05 else 'no difference']
-    st.text(f"Test for difference of means between groups returned pvalue: {round(int(ttest_pval), 3)} meaning there is {round(int(ind[0]), 3)}")
+    st.text(f"Test for difference of means between groups returned pvalue: {round(int(ttest_pval), 3)} meaning there is {ind[0]}")
 if len(uniques) == 3:
     lists = []
     grouped = booted_data.groupby('ind')
@@ -140,7 +151,7 @@ if len(uniques) == 3:
     l1,l2,l3 = map(list, zip(*lists))
     stat, pval = sp.f_oneway(l1,l2,l3)
     ind = ["a difference" if pval <0.05 else 'no difference']
-    st.text(f"Test for difference of means between groups returned pvalue: {round(int(pval), 3)} meaning there is {round(int(ind[0]), 3)}")
+    st.text(f"Test for difference of means between groups returned pvalue: {round(int(pval), 3)} meaning there is {ind[0]}")
 if len(uniques) == 4:
     lists = []
     grouped = booted_data.groupby('ind')
@@ -152,7 +163,7 @@ if len(uniques) == 4:
     l1,l2,l3,l4 = map(list, zip(*lists))
     stat, pval = sp.f_oneway(l1,l2,l3,l4)
     ind = ["a difference" if pval <0.05 else 'no difference']
-    st.text(f"Test for difference of means between groups returned pvalue: {round(int(pval), 3)} meaning there is {round(int(ind[0]), 3)}")
+    st.text(f"Test for difference of means between groups returned pvalue: {round(int(pval), 3)} meaning there is {ind[0]}")
 if len(uniques) == 5:
     lists = []
     grouped = booted_data.groupby('ind')
@@ -164,31 +175,60 @@ if len(uniques) == 5:
     l1,l2,l3,l4,l5 = map(list, zip(*lists))
     stat, pval = sp.f_oneway(l1,l2,l3,l4,l5)
     ind = ["a difference" if pval <0.05 else 'no difference']
-    st.text(f"Test for difference of means between groups returned pvalue: {round(int(pval), 3)} meaning there is {round(int(ind[0]), 3)}")
+    st.text(f"Test for difference of means between groups returned pvalue: {round(int(pval), 3)} meaning there is {ind[0]}")
 
 fig = plt.figure()
 sns.violinplot(data = booted_data, x = 'means', y= 'ind', orient='h')
 st.pyplot(fig = fig)
 
-std_vals = {'Leader/Child Interactions': 108.36, 'Supervision & Safety':64.8, 'Child/Child Interactions':48.24, 'Leader Behaviour & Interactions':34.02, 'Program Characteristics & Support':72, 'QUEST 2 Total Score':372.42}
-score_cols = data.columns[-7:-1]
-st.divider()
 
-for col in score_cols:
-    data[col] = data[col] /std_vals[col]
+value_of_interest = st.selectbox(label = 'Please select the assessment category of interest', options = lin_reg_data.columns[-6:])
+metric_of_interest = st.selectbox(label = "Please Select a variable of interest", options = ['Assessment Year', 'Participant Age', 'Program Supervisor Name', 'Assessor Name'])
 
-dfs = []
-for i in score_cols:
-    sub_data = data[i]
-    dfs.append(sub_data)
+comparator1 = st.selectbox(label='Please select the first subset of interest', options = data[metric_of_interest].unique())
+comparator2 = st.selectbox(label='Please select the second subset of interest', options = data[metric_of_interest].unique())
 
-sns.violinplot(data = data, x = 'means', y = '')
-fig = plt.figure()
+def simple_random(data, assess_category, metric, comparator):
+    """function takes data, a metric of interest and a attribute within that metric and returns a list of means generated from simple random sampling with replacement"""
+    filter_1 = data[data[metric] == comparator]
+    sample_means = []
+    for i in range(200):
+        sample = choices(list(filter_1[assess_category]), k =200)
+        mean = np.mean(sample)
+        sample_means.append(mean)
+    samples_dict = {'means' : sample_means}
+    means_df = pd.DataFrame(samples_dict)
+    means_df['ind'] = comparator
+    return sample_means, means_df
 
-
-
-
-
+cola, colb = st.columns(2)
+with cola:
+    col1, comp1_df = simple_random(data, assess_category = value_of_interest, metric = metric_of_interest, comparator=comparator1)
+    col2, comp2_df = simple_random(data, assess_category = value_of_interest, metric = metric_of_interest, comparator=comparator2)
+    alternative_hypothesis = st.selectbox(label = 'Select the alternative hypothesis you would like to test', options = ['two-sided', 'one-sided'])
+    if alternative_hypothesis == 'one-sided':
+        alternative_hypothesis = 'greater'
+    ttest, pval = sp.ttest_ind(list(col1), list(col2), alternative=alternative_hypothesis)
+    if alternative_hypothesis == 'two-sided':
+        if pval<0.05:
+            conclusion = 'difference'
+        else:
+            conclusion = 'no difference'
+    else:
+        if pval<0.05:
+            conclusion = 'greater'
+        else:
+            conclusion = 'not greater'
+    st.write(f'T-value for the test: {round(ttest, 2)}\nP-value for the test: {round(pval, 2)}')
+    if alternative_hypothesis == 'two-sided':
+        st.write(f'For the {alternative_hypothesis} test to observe a difference \nin mean {value_of_interest} between {comparator1} and {comparator2}, there was {conclusion}\n in the means of the two groups at a 95% confidence level')
+    if alternative_hypothesis == 'greater':
+        st.write(f'For the {alternative_hypothesis}, it can be concluded that the mean {value_of_interest} for {comparator1} is {conclusion} than the mean for {comparator2} at a 95% confidence level')
+with colb:
+    dfs = pd.concat([comp1_df, comp2_df])
+    fig = plt.figure()
+    sns.boxplot(x = dfs['means'], y = dfs['ind'], orient='h')
+    st.pyplot(fig = fig)
 
         
 

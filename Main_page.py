@@ -20,11 +20,13 @@ st.markdown(""" <style> .font {
 font-size:50px;} 
 </style> """, unsafe_allow_html=True)
 
-uploaded_file = st.file_uploader(label= 'Upload a File', type='csv')
-
-@st.cache_data
+uploaded_file = st.file_uploader(label= 'Upload a File', type='xlsx')
+try:
+    num_sheets = int(st.text_input(label = 'Input the number of assessment periods to observe \n(value of 0 indicates that only the first assessment period is selected)'))
+except:
+    pass
 def gen_data(uploaded_file):
-    test_data = preprocess.preprocess(uploaded_file)
+    test_data = preprocess.preprocess(uploaded_file, num_sheets)
     test_data.to_csv('tester.csv')
     general_data = pd.read_csv('tester.csv')
     return general_data
@@ -45,6 +47,10 @@ def select_box(data, options_list, name):
     return options
 
 def filter_data(data, year, session):
+    if year == 'All':
+        year = data['Assessment Year'].unique()
+    if session == 'All':
+        session = data['Session'].unique()
     filtered = data[data['Assessment Year'].isin(year)] 
     filtered2 = filtered[filtered['Session'].isin(session)] 
     return filtered2 
@@ -54,9 +60,9 @@ if uploaded_file is not None:
     data = gen_data(uploaded_file)
 
     filtered_data = data
-
+    
     year = st.sidebar.multiselect(label = "Year", options = data['Assessment Year'].unique(), default = 2022)
-
+    
     session = st.sidebar.multiselect(label='Session', options = data['Session'].unique(), default = 'Fall')
 
     column_names = {'Total Weighted Score':'Leader/Child Interactions', 'Total Weighted Score.1':'Supervision and Saftey', 'Total Weighted Score.2':'Child/Child Interactions', 'Total Weighted Score.3':'Leader Behaviour & Interactions', 'Total Weighted Score.4':'Program Characteristics and Support'}
@@ -67,7 +73,7 @@ if uploaded_file is not None:
         filtered_data = filter_data(data, year, session)
         select_agg = st.sidebar.multiselect(options = data.iloc[:,-6:].columns, label = 'Aggregate Column of Interest', default=['QUEST 2 Total Score'])
         select_agg = ['Program Name']+select_agg
-        filtered_data = filtered_data[select_agg]
+        filtered_data = filtered_data[select_agg].groupby('Program Name').aggregate('mean')
     else:
         filtered_data = filter_data(data, year, session)
         agg_cols = filtered_data.iloc[:, -6:].columns
@@ -76,7 +82,7 @@ if uploaded_file is not None:
         filtered_data['Program Name'] = names
         columns = filtered_data.columns.tolist()
         filtered_cols = columns[-1:] + columns[:-1]
-        filtered_data = filtered_data[filtered_cols]
+        filtered_data = filtered_data[filtered_cols].groupby('Program Name').aggregate('mean')
 
     alt_data = filter_data(data, year, session)
     agg_cols = alt_data.iloc[:, -6:].columns
@@ -132,17 +138,18 @@ if uploaded_file is not None:
 
     with col2:
         multi_hist_data = alt_data['QUEST 2 Total Score']
+        hist_data = filter_data(data, year = year, session=session)
         metric = st.selectbox(label = 'Select Item to Group on', options=['Session', 'Site', 'Assessor Name', 'Program Type', 'Participant Age', 'Program Supervisor Name'])
         cols_list = {}
         for item in data[metric].unique():
-            col = data[data[metric] == item]
+            col = hist_data[hist_data[metric] == item]
             cols_list[item] = col['QUEST 2 Total Score']
         merged_dat = pd.DataFrame(cols_list)
         figure2 = plt.figure()
         for i, column in enumerate(merged_dat.columns):
             sns.histplot(merged_dat[column], color=colours[i], kde = True)
         plt.xlabel('Quest 2 Score')
-        figure2.legend(data[metric].unique())
+        figure2.legend(hist_data[metric].unique())
         st.pyplot(fig=figure2)
 
 

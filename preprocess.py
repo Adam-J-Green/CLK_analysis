@@ -10,8 +10,18 @@ import re
 import streamlit as st
 import openpyxl
 
-def preprocess(file):
-  general_data = pd.read_csv(file)
+def preprocess(file, num_sheets):
+  dfs_list = []
+  for i in range(num_sheets+1):
+    try:
+      mid_dat = pd.read_excel(file, sheet_name=i, header=1)
+      num_rows = mid_dat['Assessment Date\n(DD/MM/YYYY)'].notna().sum()
+      mid_data = mid_dat.iloc[0:num_rows, :]
+      dfs_list.append(mid_data)
+    except:
+      st.write('The number of sheets selected exceeds the number of sheets available, please enter an alternate value')
+  general_data = pd.concat(dfs_list, axis=0)
+  general_data = general_data.rename({'Assessment Date\n(DD/MM/YYYY)':'Assessment Date'}, axis = 1)
   staff = []
   comments = []
   for col in general_data.columns:
@@ -22,22 +32,20 @@ def preprocess(file):
   nas = []
   df = general_data.loc[:,staff]
   for index, row in df.iterrows():
-    Num_volunteers = 8 - (row.isna().sum())
+    Num_volunteers = 9 - (row.isna().sum())
     nas.append(Num_volunteers) 
-
   general_data['volunteer_count'] = nas
   staff = staff[2:] +comments
-  general_data = general_data.drop(staff, axis = 1).iloc[:25]
+  general_data = general_data.drop(staff, axis = 1)
   general_data['Assessment Date'] = pd.to_datetime(general_data['Assessment Date'], yearfirst = True)
 
   #generate Simplified date columns
-  general_data['Assessment Year'] = general_data['Assessment Date'].apply(lambda y :  y.strftime('%Y'))
+  general_data['Assessment Year'] = general_data['Assessment Date'].apply(lambda y :  int(y.strftime('%Y')))
   general_data['Assessment Month'] = general_data['Assessment Date'].apply(lambda x : int(x.strftime('%m'))) 
-
+  
   #Generate Sessions column
   session_dict = {11: 'Fall', 5 : 'Spring', 8 :'Summer'}
   general_data['Session'] = general_data['Assessment Month'].map(session_dict)
-  print(general_data.columns)
 
   #rearrange columns
   general_data.rename({"Activity Risk Awareness'": 'Activity Risk Awareness'}, axis = 1, inplace=True)
@@ -64,7 +72,5 @@ def preprocess(file):
   #general_data.to_csv('general_data.csv')
   return general_data
 
-
-preprocess('Copy of Copy of Quest 2 Data Tracking - LM Edits 2.9.23 - Copy.csv')
 
 
