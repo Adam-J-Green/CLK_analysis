@@ -92,6 +92,8 @@ else:
     fig =plotl.line(data_fin, x = 'Date', y = cat, color = 'Program Name')
     st.plotly_chart(fig, use_container_width=True)
 
+st.divider()
+
 cole, colf = st.columns([1,1])
 with cole:
         Assessor = st.multiselect('Input Assessor Name', options = data['Assessor Name'].unique())

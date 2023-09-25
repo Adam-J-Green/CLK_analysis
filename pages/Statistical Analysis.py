@@ -61,13 +61,19 @@ def arrange_dec_tree(data):
             data[col] = data[col].str.lower()
     col1, col2 = st.columns([1,1])
     with col1:
-        Assessor = st.text_input('Input Assessor Name').lower()
-        Type = st.text_input('Input Program Type').lower()
-        Age = st.text_input('Input Participant Age').lower()
+        Assessor = st.selectbox(label = 'Input Assessor Name', options = data['Assessor Name'].unique()).lower()
+        Type = st.text_input('Input Program Type', options = data['Program Type'].unique()).lower()
+        Age = st.text_input('Input Participant Age', options = data['Participant Age'].unique()).lower()
     with col2:
-        Supervisor = st.text_input('Input Supervisor Name').lower()
-        num_child = st.text_input('Input Number of Children').lower()
-        num_super = st.text_input('Input Number of Staff/Volunteers').lower()
+        Supervisor = st.text_input('Input Supervisor Name', options = data['Program Supervisor Name'].unique()).lower()
+        num_child = st.text_input('Input Number of Children')
+        num_super = st.text_input('Input Number of Staff/Volunteers')
+    
+    try:
+        num_child = int(num_child)
+        num_super = int(num_super)
+    except:
+        pass
     new_dict = {'Assessor Name':Assessor, 'Program Type':Type, 'Participant Age':Age, 
                 'Program Supervisor Name':Supervisor, 'Total Number of Children in Program':num_child, 'Total Number of Staff/Volunteers in Program':num_super}
     df2 = data.append(new_dict, ignore_index = True)
@@ -87,7 +93,6 @@ def arrange_dec_tree(data):
     except:
         pass
     
-
 
 col1, col2 = st.columns([1,1])
 with col1:
@@ -181,6 +186,7 @@ fig = plt.figure()
 sns.violinplot(data = booted_data, x = 'means', y= 'ind', orient='h')
 st.pyplot(fig = fig)
 
+st.divider()
 
 value_of_interest = st.selectbox(label = 'Please select the assessment category of interest', options = lin_reg_data.columns[-6:])
 metric_of_interest = st.selectbox(label = "Please Select a variable of interest", options = ['Assessment Year', 'Participant Age', 'Program Supervisor Name', 'Assessor Name'])
