@@ -78,7 +78,6 @@ def arrange_dec_tree(data):
                 'Program Supervisor Name':Supervisor, 'Total Number of Children in Program':num_child, 'Total Number of Staff/Volunteers in Program':num_super}
     df2 = data.append(new_dict, ignore_index = True)
     response = data['ind']
-    #feats = df2[['Assessor Name', 'Program Type', 'Participant Age', 'Program Supervisor Name', 'Total Number of Children in Program', 'Total Number of Staff/Volunteers in Program']]
     cat_cols = df2[['Assessor Name', 'Program Type', 'Participant Age', 'Program Supervisor Name']]
     encoded_data = pd.get_dummies(cat_cols)
     encoded_data['Total Number of Children in Program'] = df2['Total Number of Children in Program']
