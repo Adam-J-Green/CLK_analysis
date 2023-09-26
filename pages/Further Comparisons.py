@@ -56,7 +56,7 @@ st.divider()
 score_groups2 = data_filt.iloc[:, -6:].columns
 
 prog1 = st.selectbox(label = 'Select Program of Interest', options = data['Program Name'].unique())
-score_data = data[data['Program Name'] == prog1]
+score_data = data_filt[data_filt['Program Name'] == prog1]
 
 fig = plt.figure()
 dfs_list = []
@@ -67,8 +67,8 @@ for i, col in enumerate(score_groups2):
     dfs_list.append(item)
 plot_dat = pd.concat(dfs_list)
 plot_dat['Assessment Year'] = plot_dat['Assessment Year'].astype('category')
-fig = plotl.bar(plot_dat, x = 'score', y = 'Quest 2 Category', color = 'Assessment Year')
-st.plotly_chart(fig, use_container_width=True )
+fig = plotl.bar(plot_dat, x = 'score', y = 'Quest 2 Category', color = 'Assessment Year', barmode = 'group', title = f'Scores Across Evaluation Categories for {prog1}')
+st.plotly_chart(fig, use_container_width=True)
 
 st.divider()
 
@@ -80,16 +80,16 @@ if st.checkbox('Show all programs'):
     data_all = data.groupby(['Assessment Year', 'Assessment Month', 'Program Name']).aggregate('mean').reset_index()
     cols=['Assessment Month', "Assessment Year"]
     data_all['Date'] = data[cols].apply(lambda x: '-'.join(x.values.astype(str)), axis="columns")
-    data_all['Date'] = pd.to_datetime(data['Date'], format='%m-%Y').dt.date
-    fig = plotl.line(data, x = 'Assessment Date', y = cat, color = 'Program Name')
+    data_all['Date'] = pd.to_datetime(data_all['Date'], format='%m-%Y').dt.date
+    fig = plotl.line(data, x = 'Assessment Date', y = cat, color = 'Program Name', title =f'Change in {cat} by Year Across all Programs')
     st.plotly_chart(fig, use_container_width=True)
 else:
-    data_fin = data[(data['Program Name'] == prog1) | (data['Program Name'] == prog2[0])]
+    data_fin = data[data['Program Name'].isin([prog1, prog2])]
     data_fin = data_fin.groupby(['Assessment Year', 'Assessment Month', 'Program Name']).aggregate('mean').reset_index()
     cols=['Assessment Month', "Assessment Year"]
     data_fin['Date'] = data_fin[cols].apply(lambda x: '-'.join(x.values.astype(str)), axis="columns")
     data_fin['Date'] = pd.to_datetime(data_fin['Date'], format='%m-%Y').dt.date
-    fig =plotl.line(data_fin, x = 'Date', y = cat, color = 'Program Name')
+    fig =plotl.line(data_fin, x = 'Date', y = cat, color = 'Program Name', title =f'Change in {cat} by Year Across {prog1} and {prog2}')
     st.plotly_chart(fig, use_container_width=True)
 
 st.divider()

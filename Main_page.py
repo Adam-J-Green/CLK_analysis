@@ -161,29 +161,38 @@ if uploaded_file is not None:
         with col3:
             x_ax = st.selectbox(label = 'X-Axis Value', options=alt_data.columns[1:])
             y_ax = st.selectbox(label = 'Y-Axis Value', options = alt_data.columns[1:])
-            fig = plotl.scatter(data_frame=alt_data, x = alt_data[x_ax], y = alt_data[y_ax],hover_name = 'Program Name', hover_data=[x_ax, y_ax], trendline = 'ols', )
+            fig = plotl.scatter(data_frame=alt_data, x = alt_data[x_ax], y = alt_data[y_ax],hover_name = 'Program Name', hover_data=[x_ax, y_ax], trendline = 'ols', title = 'Program Evaluation Scores - Comparison of Scoring Categories' )
             fig.update_traces(line_color = 'orange', marker = dict(color= 'orange'))
             st.plotly_chart(fig, use_container_width=True)
 
 
         with col4:
-            metric_scatter = st.selectbox(label = 'Select Metric to Display', options = filtered_data.iloc[:,1:].columns)
+            metric_scatter = st.selectbox(label = 'Select Metric to Display', options = filtered_data.reset_index().columns[1:])
             grouper = st.selectbox(label = 'Select Grouping Item', options = ['Leader Count', 'Child Count', 'Ratio Child:Leader'])
             if grouper == 'Leader Count':
                 data['Leader Count'] = np.where(data['Total Number of Staff/Volunteers in Program']>3, 'Greater than 3', 'Less than 3')
                 fig = plt.figure()
-                sns.barplot(data, x = data['Leader Count'], y = metric_scatter)
+                ax = sns.barplot(data, x = data['Leader Count'], y = metric_scatter, errwidth = 0)
+                for i in ax.containers:
+                    ax.bar_label(i,)
+                plt.title('Differences in Evaluation Scores for \nPrograms with Greater/Fewer Leaders')
                 st.pyplot(fig = fig)
             elif grouper == 'Child Count':
                 data['Child Count'] = np.where(data['Total Number of Children in Program']>8, 'Greater than 8', 'Less than 8')
                 fig = plt.figure()
-                sns.barplot(data, x = 'Child Count' , y = metric_scatter)
+                ax = sns.barplot(data, x = 'Child Count' , y = metric_scatter, errwidth = 0)
+                for i in ax.containers:
+                    ax.bar_label(i,)
+                plt.title('Differences in Evaluation Scores for \nPrograms with Greater/Fewer Children')
                 st.pyplot(fig = fig)
             elif grouper == 'Ratio Child:Leader':
                 data['ratio'] = (data['Total Number of Children in Program']/data['Total Number of Staff/Volunteers in Program'])
-                data['Child:Leader Ratio'] = np.where(data['Total Number of Children in Program']>3,'Greater than 3', 'Less than 3')
+                data['Child:Leader Ratio'] = np.where(data['ratio']>3,'Greater than 3', 'Less than 3')
                 fig = plt.figure()
-                sns.barplot(data, x = 'Child:Leader Ratio' , y = metric_scatter)
+                ax = sns.barplot(data, x = 'Child:Leader Ratio' , y = metric_scatter, errwidth = 0)
+                for i in ax.containers:
+                    ax.bar_label(i,)
+                plt.title('Differences in Evaluation Scores for Programs \nwith Higher/Lower Leader to Child Ratio')
                 st.pyplot(fig = fig)
     except:
         st.write('Please enter the number of assessment periods you would like to view')

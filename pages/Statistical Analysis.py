@@ -14,6 +14,7 @@ from sklearn.tree import DecisionTreeClassifier
 import numpy as np
 from random import choices
 import Main_page
+from sklearn import tree
 
 colours = ['blue', 'orange', 'green', 'red', 'yellow', 'pink']
 
@@ -54,7 +55,7 @@ def arrange_lin_model(data):
 
 def arrange_dec_tree(data):
     response = st.selectbox(label = "Select response variable for Decision Tree", options = lin_reg_data.columns[-6:])
-    mean = data[response].mean()
+    mean = data[response].median()
     data['ind'] = np.where(data[response]>mean, 1, 0)
     for col in data.columns:
         if data[col].dtype == 'object':
@@ -62,10 +63,10 @@ def arrange_dec_tree(data):
     col1, col2 = st.columns([1,1])
     with col1:
         Assessor = st.selectbox(label = 'Input Assessor Name', options = data['Assessor Name'].unique()).lower()
-        Type = st.text_input('Input Program Type', options = data['Program Type'].unique()).lower()
-        Age = st.text_input('Input Participant Age', options = data['Participant Age'].unique()).lower()
+        Type = st.selectbox('Input Program Type', options = data['Program Type'].unique()).lower()
+        Age = st.selectbox('Input Participant Age', options = data['Participant Age'].unique()).lower()
     with col2:
-        Supervisor = st.text_input('Input Supervisor Name', options = data['Program Supervisor Name'].unique()).lower()
+        Supervisor = st.selectbox('Input Supervisor Name', options = data['Program Supervisor Name'].unique()).lower()
         num_child = st.text_input('Input Number of Children')
         num_super = st.text_input('Input Number of Staff/Volunteers')
     
@@ -88,7 +89,7 @@ def arrange_dec_tree(data):
     dect.fit(X = encoded_data, y = response)
     try:
         preds = dect.predict_proba([new_data])
-        st.write("Predicted Probability:",preds[:,1][-1]*100)
+        st.write("Predicted probability that the program will score above average overall:",preds[:,1][-1]*100)
     except:
         pass
     
