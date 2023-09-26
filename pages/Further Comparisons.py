@@ -27,12 +27,13 @@ for col in agg_cols:
     data[col] = data[col] /std_vals[col]
 
 data_filt = filter_data(data, year, session)
-cola, colb = st.columns([1,1])
+
 
 cat_groups = data_filt.iloc[:, [3,5,6,8,9,12]].columns
 score_groups = data_filt.iloc[:, -6:-1].columns
 
 cat = st.selectbox(label = 'Select variable to group by', options = cat_groups)
+cola, colb = st.columns([1,1])
 with colb:
     dfs_list = []
     for i, col in enumerate(score_groups):
@@ -43,12 +44,15 @@ with colb:
     plot_dat = pd.concat(dfs_list)
     fig = plt.figure()
     sns.boxplot(plot_dat, x = 'score', y ='Quest 2 Category', hue=cat, orient = 'h')
+    plt.title('Summary of Evaluation Scores, Stratified by Program Characteristic of Interest')
     st.pyplot(fig)
 with cola:
     grouped = plot_dat.groupby(['Quest 2 Category', cat]).aggregate(Score_mean=pd.NamedAgg(column="score", aggfunc="mean"))
     grouped = grouped.reset_index()
     fig = plt.figure()
     sns.barplot(data = grouped, x =  'Score_mean', y ='Quest 2 Category', hue = cat, orient='h')
+    plt.title('Comparison of Evaluation Scores, Stratified by Program Characteristic of Interest')
+    plt.xlabel('Mean Score')
     st.pyplot(fig)
 
 st.divider()

@@ -133,6 +133,7 @@ if uploaded_file is not None:
             fig = plt.figure()
             for i, col in enumerate(selected_cols):
                 sns.histplot(hist_data[col], color=colours[i], kde = True)
+            plt.title('Distribution of Evaluation Scores Across Programs') 
             plt.xlabel('Score')
             fig.legend(selected_cols)
             st.pyplot(fig=fig)
@@ -150,6 +151,7 @@ if uploaded_file is not None:
             for i, column in enumerate(merged_dat.columns):
                 sns.histplot(merged_dat[column], color=colours[i], kde = True)
             plt.xlabel('Quest 2 Score')
+            plt.title('Distribution of QUEST 2 Total Score Across Program Category of Interest')
             figure2.legend(hist_data[metric].unique())
             st.pyplot(fig=figure2)
 
