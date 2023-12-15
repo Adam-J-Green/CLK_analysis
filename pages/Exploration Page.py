@@ -124,9 +124,10 @@ if uploaded_file is not None:
         with col2:
             multi_hist_data = alt_data['QUEST 2 Total Score']
             hist_data = filter_data(data, year = year, session=session)
-            metric = st.selectbox(label = 'Select Item to Group on', options=['Session', 'Site', 'Assessor Name', 'Program Type', 'Participant Age', 'Program Supervisor Name'])
+            metric = st.selectbox(label = 'Select Item to Group on', options=['Session', 'Assessor Name', 'Program Type', 'Participant Age', 'Program Supervisor Name'])
             cols_list = {}
             for item in data[metric].unique():
+                
                 col = hist_data[hist_data[metric] == item]
                 cols_list[item] = col['QUEST 2 Total Score']
             merged_dat = pd.DataFrame(cols_list)

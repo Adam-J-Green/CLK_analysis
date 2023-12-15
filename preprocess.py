@@ -17,8 +17,12 @@ def preprocess(file, num_sheets):
       mid_dat = pd.read_excel(file, sheet_name=i, header=1)
       num_rows = mid_dat['Assessment Date\n(DD/MM/YYYY)'].notna().sum()
       mid_data = mid_dat.iloc[0:num_rows, :]
+      
+      mid_data['Assessment Date\n(DD/MM/YYYY)'] = pd.to_datetime(mid_data['Assessment Date\n(DD/MM/YYYY)'], dayfirst=True)
+      
       dfs_list.append(mid_data)
-    except:
+    except Exception as e:
+      st.write(e)
       st.write('The number of sheets selected exceeds the number of sheets available, please enter an alternate value')
   general_data = pd.concat(dfs_list, axis=0)
   general_data = general_data.rename({'Assessment Date\n(DD/MM/YYYY)':'Assessment Date'}, axis = 1)
@@ -37,14 +41,21 @@ def preprocess(file, num_sheets):
   general_data['volunteer_count'] = nas
   staff = staff[2:] +comments
   general_data = general_data.drop(staff, axis = 1)
-  general_data['Assessment Date'] = pd.to_datetime(general_data['Assessment Date'], yearfirst = True)
-
+  
+  #general_data['Assessment Date'] = general_data['Assessment Date'].dt.strftime('%Y-%M-%d')
+  
+  #general_data['Assessment Date']=general_data['Assessment Date'].astype(str).str.pad(width=10, side='left', fillchar='0')
+  
+  #general_data['Assessment Date'] = pd.to_datetime(general_data['Assessment Date']).dt.strftime('%Y-%m-%d')
+  
+  general_data['Assessment Date'] = pd.to_datetime(general_data['Assessment Date'])
+  
   #generate Simplified date columns
   general_data['Assessment Year'] = general_data['Assessment Date'].apply(lambda y :  int(y.strftime('%Y')))
   general_data['Assessment Month'] = general_data['Assessment Date'].apply(lambda x : int(x.strftime('%m'))) 
   
   #Generate Sessions column
-  session_dict = {11: 'Fall', 5 : 'Spring', 8 :'Summer'}
+  session_dict = {11: 'Fall', 10: 'Fall', 5 : 'Spring', 8 :'Summer'}
   general_data['Session'] = general_data['Assessment Month'].map(session_dict)
 
   #rearrange columns

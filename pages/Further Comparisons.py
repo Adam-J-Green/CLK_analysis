@@ -17,7 +17,8 @@ def filter_data(data, year, session):
     filtered2 = filtered[filtered['Session'].isin(session)] 
     return filtered2 
 
-year = st.sidebar.multiselect(label = "Year", options = data['Assessment Year'].unique(), default = 2022)
+year_options = data['Assessment Year'].unique()
+year = st.sidebar.multiselect(label = "Year", options = data['Assessment Year'].unique(), default = year_options[0])
 
 session = st.sidebar.multiselect(label='Session', options = data['Session'].unique(), default = 'Fall')
 
