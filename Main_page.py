@@ -23,6 +23,7 @@ font-size:50px;}
 uploaded_file = st.file_uploader(label= 'Upload a File', type='xlsx')
 try:
     num_sheets = int(st.text_input(label = 'Input the number of assessment periods to observe \n(value of 0 indicates that only the first assessment period is selected)'))
+    st.success('Data Upload Complete. Proceed to the Exploration Pages')
 except:
     pass
 

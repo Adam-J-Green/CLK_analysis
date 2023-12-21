@@ -14,7 +14,7 @@ colours = ['blue', 'orange', 'green', 'red', 'yellow', 'pink']
 
 data = pd.read_csv('tester.csv')
 
-
+st.set_page_config(page_title = 'Exploratory Plots', layout = 'wide')
 def get_agg_cols(data):
         agg_data = ['Program Name']
         cols = data.iloc[:,-6:]
@@ -124,7 +124,7 @@ if uploaded_file is not None:
         with col2:
             multi_hist_data = alt_data['QUEST 2 Total Score']
             hist_data = filter_data(data, year = year, session=session)
-            metric = st.selectbox(label = 'Select Item to Group on', options=['Session', 'Assessor Name', 'Program Type', 'Participant Age', 'Program Supervisor Name'])
+            metric = st.selectbox(label = 'Select Item to Group on', options=['Session','Assessment Year', 'Assessor Name', 'Program Type', 'Participant Age', 'Program Supervisor Name'])
             cols_list = {}
             for item in data[metric].unique():
                 
@@ -155,6 +155,7 @@ if uploaded_file is not None:
         with col4:
             metric_scatter = st.selectbox(label = 'Select Metric to Display', options = filtered_data.reset_index().columns[1:])
             grouper = st.selectbox(label = 'Select Grouping Item', options = ['Leader Count', 'Child Count', 'Ratio Child:Leader'])
+            data = filter_data(data, year, session)
             if grouper == 'Leader Count':
                 data['Leader Count'] = np.where(data['Total Number of Staff/Volunteers in Program']>3, 'Greater than 3', 'Less than 3')
                 fig = plt.figure()
