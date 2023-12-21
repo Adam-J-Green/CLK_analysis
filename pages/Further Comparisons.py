@@ -8,6 +8,8 @@ import seaborn as sns
 from datetime import datetime
 import Main_page
 
+colours = ['blue', 'orange', 'green', 'red', 'yellow', 'pink']
+st.set_page_config(layout = 'wide')
 data = pd.read_csv('tester.csv')
 
 std_vals = {'Leader/Child Interactions': 108.36, 'Supervision & Safety':64.8, 'Child/Child Interactions':48.24, 'Leader Behaviour & Interactions':34.02, 'Program Characteristics & Support':72, 'QUEST 2 Total Score':327.42}
@@ -44,14 +46,16 @@ with colb:
         dfs_list.append(item)
     plot_dat = pd.concat(dfs_list)
     fig = plt.figure()
-    sns.boxplot(plot_dat, x = 'score', y ='Quest 2 Category', hue=cat, orient = 'h')
+    pic = sns.boxplot(plot_dat, x = 'score', y ='Quest 2 Category', hue=cat, orient = 'h', hue_order=plot_dat[cat].unique())
+    sns.move_legend(pic, "upper left", bbox_to_anchor=(-0.25, -0.15), ncol = len(plot_dat[cat].unique()))
     plt.title('Summary of Evaluation Scores, Stratified by Program Characteristic of Interest')
     st.pyplot(fig)
 with cola:
     grouped = plot_dat.groupby(['Quest 2 Category', cat]).aggregate(Score_mean=pd.NamedAgg(column="score", aggfunc="mean"))
     grouped = grouped.reset_index()
     fig = plt.figure()
-    sns.barplot(data = grouped, x =  'Score_mean', y ='Quest 2 Category', hue = cat, orient='h')
+    pic = sns.barplot(data = grouped, x =  'Score_mean', y ='Quest 2 Category', hue = cat, orient='h', hue_order=plot_dat[cat].unique())
+    sns.move_legend(pic, "upper left", bbox_to_anchor=(-0.25, -0.15), ncol = len(plot_dat[cat].unique()))
     plt.title('Comparison of Evaluation Scores, Stratified by Program Characteristic of Interest')
     plt.xlabel('Mean Score')
     st.pyplot(fig)

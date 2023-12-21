@@ -16,6 +16,8 @@ from random import choices
 import Main_page
 from sklearn import tree
 
+
+st.set_page_config(layout = 'wide')
 colours = ['blue', 'orange', 'green', 'red', 'yellow', 'pink']
 
 st.divider()
