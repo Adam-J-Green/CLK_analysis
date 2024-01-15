@@ -10,11 +10,12 @@ import scipy.stats as sp
 from tabulate import tabulate
 import preprocess
 
-colours = ['blue', 'orange', 'green', 'red', 'yellow', 'pink']
+st.set_page_config(page_title = 'Exploratory Plots', layout = 'wide')
+colours = ['blue', 'orange', 'green', 'red', 'purple', 'pink']
 
 data = pd.read_csv('tester.csv')
 
-st.set_page_config(page_title = 'Exploratory Plots', layout = 'wide')
+
 def get_agg_cols(data):
         agg_data = ['Program Name']
         cols = data.iloc[:,-6:]
@@ -115,7 +116,7 @@ if uploaded_file is not None:
             selected_cols = list(st.multiselect(label='Select Variables to Display', options=hist_data.columns, default='Leader/Child Interactions'))
             fig = plt.figure()
             for i, col in enumerate(selected_cols):
-                sns.histplot(hist_data[col], color=colours[i], kde = True)
+                sns.histplot(hist_data[col], color=colours[i], kde = True, multiple = 'stack')
             plt.title('Distribution of Evaluation Scores Across Programs') 
             plt.xlabel('Score')
             fig.legend(selected_cols)
@@ -133,7 +134,7 @@ if uploaded_file is not None:
             merged_dat = pd.DataFrame(cols_list)
             figure2 = plt.figure()
             for i, column in enumerate(merged_dat.columns):
-                sns.histplot(merged_dat[column], color=colours[i], kde = True)
+                sns.histplot(merged_dat[column], color=colours[i], kde = True, binrange=(170, 340), multiple = 'stack', binwidth=15)
             plt.xlabel('Quest 2 Score')
             plt.title('Distribution of QUEST 2 Total Score Across Program Category of Interest')
             figure2.legend(hist_data[metric].unique())

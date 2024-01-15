@@ -7,9 +7,9 @@ import plotly.express as plotl
 import seaborn as sns
 from datetime import datetime
 import Main_page
-
-colours = ['blue', 'orange', 'green', 'red', 'yellow', 'pink']
 st.set_page_config(layout = 'wide')
+colours = ['blue', 'orange', 'green', 'red', 'yellow', 'pink']
+
 data = pd.read_csv('tester.csv')
 
 std_vals = {'Leader/Child Interactions': 108.36, 'Supervision & Safety':64.8, 'Child/Child Interactions':48.24, 'Leader Behaviour & Interactions':34.02, 'Program Characteristics & Support':72, 'QUEST 2 Total Score':327.42}
