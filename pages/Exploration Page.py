@@ -117,7 +117,7 @@ if uploaded_file is not None:
             fig = plt.figure()
             for i, col in enumerate(selected_cols):
                 sns.histplot(hist_data[col], color=colours[i], kde = True, multiple = 'stack')
-            plt.title('Distribution of Evaluation Scores Across Programs') 
+            plt.title('Figure 1: Distribution of Evaluation Scores Across Programs') 
             plt.xlabel('Score')
             fig.legend(selected_cols)
             st.pyplot(fig=fig)
@@ -136,7 +136,7 @@ if uploaded_file is not None:
             for i, column in enumerate(merged_dat.columns):
                 sns.histplot(merged_dat[column], color=colours[i], kde = True, binrange=(170, 340), multiple = 'stack', binwidth=15)
             plt.xlabel('Quest 2 Score')
-            plt.title('Distribution of QUEST 2 Total Score Across Program Category of Interest')
+            plt.title('Figure 2: Distribution of QUEST 2 Total Score Across \nProgram Category of Interest')
             figure2.legend(hist_data[metric].unique())
             st.pyplot(fig=figure2)
 
@@ -148,7 +148,7 @@ if uploaded_file is not None:
         with col3:
             x_ax = st.selectbox(label = 'X-Axis Value', options=alt_data.columns[1:])
             y_ax = st.selectbox(label = 'Y-Axis Value', options = alt_data.columns[1:])
-            fig = plotl.scatter(data_frame=alt_data, x = alt_data[x_ax], y = alt_data[y_ax],hover_name = 'Program Name', hover_data=[x_ax, y_ax], trendline = 'ols', title = 'Program Evaluation Scores - Comparison of Scoring Categories' )
+            fig = plotl.scatter(data_frame=alt_data, x = alt_data[x_ax], y = alt_data[y_ax],hover_name = 'Program Name', hover_data=[x_ax, y_ax], trendline = 'ols', title = 'Figure 3: Program Evaluation Scores - Comparison of Scoring Categories' )
             fig.update_traces(line_color = 'orange', marker = dict(color= 'orange'))
             st.plotly_chart(fig, use_container_width=True)
 
@@ -163,7 +163,7 @@ if uploaded_file is not None:
                 ax = sns.barplot(data, x = data['Leader Count'], y = metric_scatter, errwidth = 0)
                 for i in ax.containers:
                     ax.bar_label(i,)
-                plt.title('Differences in Evaluation Scores for \nPrograms with Greater/Fewer Leaders')
+                plt.title('Figure 4: Differences in Evaluation Scores for \nPrograms with Greater/Fewer Leaders')
                 st.pyplot(fig = fig)
             elif grouper == 'Child Count':
                 data['Child Count'] = np.where(data['Total Number of Children in Program']>8, 'Greater than 8', 'Less than 8')
@@ -171,7 +171,7 @@ if uploaded_file is not None:
                 ax = sns.barplot(data, x = 'Child Count' , y = metric_scatter, errwidth = 0)
                 for i in ax.containers:
                     ax.bar_label(i,)
-                plt.title('Differences in Evaluation Scores for \nPrograms with Greater/Fewer Children')
+                plt.title('Figure 4 Differences in Evaluation Scores for \nPrograms with Greater/Fewer Children')
                 st.pyplot(fig = fig)
             elif grouper == 'Ratio Child:Leader':
                 data['ratio'] = (data['Total Number of Children in Program']/data['Total Number of Staff/Volunteers in Program'])
@@ -180,7 +180,7 @@ if uploaded_file is not None:
                 ax = sns.barplot(data, x = 'Child:Leader Ratio' , y = metric_scatter, errwidth = 0)
                 for i in ax.containers:
                     ax.bar_label(i,)
-                plt.title('Differences in Evaluation Scores for Programs \nwith Higher/Lower Leader to Child Ratio')
+                plt.title('Figure 4: Differences in Evaluation Scores for Programs \nwith Higher/Lower Leader to Child Ratio')
                 st.pyplot(fig = fig)
     except Exception as e:
         print('something went wrong')

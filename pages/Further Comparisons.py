@@ -48,7 +48,7 @@ with colb:
     fig = plt.figure()
     pic = sns.boxplot(plot_dat, x = 'score', y ='Quest 2 Category', hue=cat, orient = 'h', hue_order=plot_dat[cat].unique())
     sns.move_legend(pic, "upper left", bbox_to_anchor=(-0.25, -0.15), ncol = len(plot_dat[cat].unique()))
-    plt.title('Summary of Evaluation Scores, Stratified by Program Characteristic of Interest')
+    plt.title('Figure 6: Summary of Evaluation Scores, Stratified by Program \nCharacteristic of Interest')
     st.pyplot(fig)
 with cola:
     grouped = plot_dat.groupby(['Quest 2 Category', cat]).aggregate(Score_mean=pd.NamedAgg(column="score", aggfunc="mean"))
@@ -56,7 +56,7 @@ with cola:
     fig = plt.figure()
     pic = sns.barplot(data = grouped, x =  'Score_mean', y ='Quest 2 Category', hue = cat, orient='h', hue_order=plot_dat[cat].unique())
     sns.move_legend(pic, "upper left", bbox_to_anchor=(-0.25, -0.15), ncol = len(plot_dat[cat].unique()))
-    plt.title('Comparison of Evaluation Scores, Stratified by Program Characteristic of Interest')
+    plt.title('Figure 5: Comparison of Evaluation Scores, Stratified by Program \nCharacteristic of Interest')
     plt.xlabel('Mean Score')
     st.pyplot(fig)
 
@@ -76,7 +76,7 @@ for i, col in enumerate(score_groups2):
     dfs_list.append(item)
 plot_dat = pd.concat(dfs_list)
 plot_dat['Assessment Year'] = plot_dat['Assessment Year'].astype('category')
-fig = plotl.bar(plot_dat, x = 'score', y = 'Quest 2 Category', color = 'Assessment Year', barmode = 'group', title = f'Scores Across Evaluation Categories for {prog1}')
+fig = plotl.bar(plot_dat, x = 'score', y = 'Quest 2 Category', color = 'Assessment Year', barmode = 'group', title = f'Figure 7: Scores Across Evaluation Categories for {prog1}')
 st.plotly_chart(fig, use_container_width=True)
 
 st.divider()
@@ -90,7 +90,7 @@ if st.checkbox('Show all programs'):
     cols=['Assessment Month', "Assessment Year"]
     data_all['Date'] = data[cols].apply(lambda x: '-'.join(x.values.astype(str)), axis="columns")
     data_all['Date'] = pd.to_datetime(data_all['Date'], format='%m-%Y').dt.date
-    fig = plotl.line(data, x = 'Assessment Date', y = cat, color = 'Program Name', title =f'Change in {cat} by Year Across all Programs')
+    fig = plotl.line(data, x = 'Assessment Date', y = cat, color = 'Program Name', title =f'Figure 8: Change in {cat} by Year Across all Programs')
     st.plotly_chart(fig, use_container_width=True)
 else:
     data_fin = data[data['Program Name'].isin([prog1, prog2])]
@@ -98,7 +98,7 @@ else:
     cols=['Assessment Month', "Assessment Year"]
     data_fin['Date'] = data_fin[cols].apply(lambda x: '-'.join(x.values.astype(str)), axis="columns")
     data_fin['Date'] = pd.to_datetime(data_fin['Date'], format='%m-%Y').dt.date
-    fig =plotl.line(data_fin, x = 'Date', y = cat, color = 'Program Name', title =f'Change in {cat} by Year Across {prog1} and {prog2}')
+    fig =plotl.line(data_fin, x = 'Date', y = cat, color = 'Program Name', title =f'Figure 8: Change in {cat} by Year Across {prog1} and {prog2}')
     st.plotly_chart(fig, use_container_width=True)
 
 st.divider()

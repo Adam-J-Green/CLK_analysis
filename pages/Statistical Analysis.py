@@ -184,8 +184,11 @@ if len(uniques) == 5:
     ind = ["a difference" if pval <0.05 else 'no difference']
     st.text(f"Test for difference of means between groups returned pvalue: {round(int(pval), 3)} meaning there is {ind[0]}")
 
+st.divider()
+
 fig = plt.figure()
 sns.violinplot(data = booted_data, x = 'means', y= 'ind', orient='h')
+plt.title(f"Figure 9: Standardized distribution of observations for {indic} by {cat_var}")
 st.pyplot(fig = fig)
 
 st.divider()
@@ -236,6 +239,7 @@ with colb:
     dfs = pd.concat([comp1_df, comp2_df])
     fig = plt.figure()
     sns.boxplot(x = dfs['means'], y = dfs['ind'], orient='h')
+    plt.title(f'Figure 10: The distribution of {metric_of_interest} by {value_of_interest}')
     st.pyplot(fig = fig)
 
         
