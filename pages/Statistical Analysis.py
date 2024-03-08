@@ -18,7 +18,7 @@ from sklearn import tree
 
 
 st.set_page_config(layout = 'wide')
-colours = ['blue', 'orange', 'green', 'red', 'yellow', 'pink']
+colours = ['blue', 'cyan', 'green', 'red', 'yellow', 'pink']
 
 st.divider()
 st.markdown(""" <style> .font {

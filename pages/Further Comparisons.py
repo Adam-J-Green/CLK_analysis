@@ -7,6 +7,7 @@ import plotly.express as plotl
 import seaborn as sns
 from datetime import datetime
 import Main_page
+
 st.set_page_config(layout = 'wide')
 colours = ['blue', 'orange', 'green', 'red', 'yellow', 'pink']
 

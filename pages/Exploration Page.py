@@ -11,7 +11,7 @@ from tabulate import tabulate
 import preprocess
 
 st.set_page_config(page_title = 'Exploratory Plots', layout = 'wide')
-colours = ['blue', 'orange', 'green', 'red', 'purple', 'pink']
+colours = ['blue', 'orange', 'green', 'red', 'cyan', 'pink']
 
 data = pd.read_csv('tester.csv')
 
@@ -112,7 +112,7 @@ if uploaded_file is not None:
 
         col1, col2 = st.columns([1,1])
         with col1:
-            hist_data = alt_data.drop('QUEST 2 Total Score', axis = 1)
+            hist_data = alt_data.drop(['QUEST 2 Total Score', 'Program Name'], axis = 1)
             selected_cols = list(st.multiselect(label='Select Variables to Display', options=hist_data.columns, default='Leader/Child Interactions'))
             fig = plt.figure()
             for i, col in enumerate(selected_cols):
@@ -127,14 +127,16 @@ if uploaded_file is not None:
             hist_data = filter_data(data, year = year, session=session)
             metric = st.selectbox(label = 'Select Item to Group on', options=['Session','Assessment Year', 'Assessor Name', 'Program Type', 'Participant Age', 'Program Supervisor Name'])
             cols_list = {}
-            for item in data[metric].unique():
+            if metric == 'Program Supervisor Name':
+                hist_data[metric] = hist_data[metric].apply(lambda x: x.strip(' '))
+            for item in hist_data[metric].unique():
                 
                 col = hist_data[hist_data[metric] == item]
                 cols_list[item] = col['QUEST 2 Total Score']
             merged_dat = pd.DataFrame(cols_list)
             figure2 = plt.figure()
             for i, column in enumerate(merged_dat.columns):
-                sns.histplot(merged_dat[column], color=colours[i], kde = True, binrange=(170, 340), multiple = 'stack', binwidth=15)
+                sns.kdeplot(merged_dat[column], color=colours[i])
             plt.xlabel('Quest 2 Score')
             plt.title('Figure 2: Distribution of QUEST 2 Total Score Across \nProgram Category of Interest')
             figure2.legend(hist_data[metric].unique())
