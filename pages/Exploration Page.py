@@ -73,7 +73,7 @@ if uploaded_file is not None:
         agg_cols = alt_data.iloc[:, -6:].columns
         agg_cols = agg_cols.insert(0, 'Program Name')
         alt_data = alt_data[agg_cols]
-
+        
 
         if st.sidebar.checkbox('Normalized Values'): 
             for i in filtered_data.columns[1:]:
@@ -148,10 +148,19 @@ if uploaded_file is not None:
         col3, col4 = st.columns([1,1])
 
         with col3:
+            comparison_data = filter_data(data, year, session)
+            comparison_data['Assessment Year'] = comparison_data['Assessment Year'].astype('category')
             x_ax = st.selectbox(label = 'X-Axis Value', options=alt_data.columns[1:])
             y_ax = st.selectbox(label = 'Y-Axis Value', options = alt_data.columns[1:])
-            fig = plotl.scatter(data_frame=alt_data, x = alt_data[x_ax], y = alt_data[y_ax],hover_name = 'Program Name', hover_data=[x_ax, y_ax], trendline = 'ols', title = 'Figure 3: Program Evaluation Scores - Comparison of Scoring Categories' )
-            fig.update_traces(line_color = 'orange', marker = dict(color= 'orange'))
+            year_filter_scatter = st.checkbox(label = 'Group by Year', key = 'year')
+            session_filter_scatter = st.checkbox(label = 'Group by Session', key = 'session')
+            if year_filter_scatter:
+                fig = plotl.scatter(data_frame=comparison_data, x = comparison_data[x_ax], y = comparison_data[y_ax], color_discrete_sequence=colours, color= comparison_data['Assessment Year'], hover_name = 'Program Name', hover_data=[x_ax, y_ax], trendline = 'ols', title = 'Figure 3: Program Evaluation Scores - Comparison of Scoring Categories' )
+            elif session_filter_scatter:
+                fig = plotl.scatter(data_frame=comparison_data, x = comparison_data[x_ax], y = comparison_data[y_ax],color_discrete_sequence=colours, color= comparison_data['Session'], hover_name = 'Program Name', hover_data=[x_ax, y_ax], trendline = 'ols', title = 'Figure 3: Program Evaluation Scores - Comparison of Scoring Categories' )
+            else:
+                fig = plotl.scatter(data_frame=comparison_data, x = comparison_data[x_ax], y = comparison_data[y_ax], hover_name = 'Program Name', hover_data=[x_ax, y_ax], trendline = 'ols', title = 'Figure 3: Program Evaluation Scores - Comparison of Scoring Categories' ) 
+                fig.update_traces(line_color = 'orange', marker = dict(color= 'orange'))
             st.plotly_chart(fig, use_container_width=True)
 
 
@@ -159,18 +168,32 @@ if uploaded_file is not None:
             metric_scatter = st.selectbox(label = 'Select Metric to Display', options = filtered_data.reset_index().columns[1:])
             grouper = st.selectbox(label = 'Select Grouping Item', options = ['Leader Count', 'Child Count', 'Ratio Child:Leader'])
             data = filter_data(data, year, session)
+            year_filter = st.checkbox('Group by Year')
+            session_filter = st.checkbox('Group by Session')
             if grouper == 'Leader Count':
                 data['Leader Count'] = np.where(data['Total Number of Staff/Volunteers in Program']>3, 'Greater than 3', 'Less than 3')
                 fig = plt.figure()
-                ax = sns.barplot(data, x = data['Leader Count'], y = metric_scatter, errwidth = 0)
+                if year_filter:
+                    ax = sns.barplot(data, x = data['Leader Count'], y = metric_scatter, hue = data['Assessment Year'], errwidth = 0)
+                elif session_filter:
+                    ax = sns.barplot(data, x = data['Leader Count'], y = metric_scatter, hue = data['Session'], errwidth = 0) 
+                else:
+                    ax = sns.barplot(data, x = data['Leader Count'], y = metric_scatter, errwidth = 0)
+                
                 for i in ax.containers:
                     ax.bar_label(i,)
                 plt.title('Figure 4: Differences in Evaluation Scores for \nPrograms with Greater/Fewer Leaders')
                 st.pyplot(fig = fig)
+
             elif grouper == 'Child Count':
                 data['Child Count'] = np.where(data['Total Number of Children in Program']>8, 'Greater than 8', 'Less than 8')
                 fig = plt.figure()
-                ax = sns.barplot(data, x = 'Child Count' , y = metric_scatter, errwidth = 0)
+                if year_filter:
+                    ax = sns.barplot(data, x = 'Child Count', y = metric_scatter, hue = data['Assessment Year'], errwidth = 0)
+                elif session_filter:
+                    ax = sns.barplot(data, x = 'Child Count', y = metric_scatter, hue = data['Session'], errwidth = 0) 
+                else:
+                    ax = sns.barplot(data, x = 'Child Count', y = metric_scatter, errwidth = 0)
                 for i in ax.containers:
                     ax.bar_label(i,)
                 plt.title('Figure 4 Differences in Evaluation Scores for \nPrograms with Greater/Fewer Children')
@@ -179,7 +202,13 @@ if uploaded_file is not None:
                 data['ratio'] = (data['Total Number of Children in Program']/data['Total Number of Staff/Volunteers in Program'])
                 data['Child:Leader Ratio'] = np.where(data['ratio']>3,'Greater than 3', 'Less than 3')
                 fig = plt.figure()
-                ax = sns.barplot(data, x = 'Child:Leader Ratio' , y = metric_scatter, errwidth = 0)
+                if year_filter:
+                    ax = sns.barplot(data, x = 'Child:Leader Ratio', y = metric_scatter, hue = data['Assessment Year'], errwidth = 0)
+                elif session_filter:
+                    ax = sns.barplot(data, x = 'Child:Leader Ratio', y = metric_scatter, hue = data['Session'], errwidth = 0) 
+                else:
+                    ax = sns.barplot(data, x = 'Child:Leader Ratio', y = metric_scatter, errwidth = 0)
+
                 for i in ax.containers:
                     ax.bar_label(i,)
                 plt.title('Figure 4: Differences in Evaluation Scores for Programs \nwith Higher/Lower Leader to Child Ratio')
