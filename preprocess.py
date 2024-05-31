@@ -12,7 +12,7 @@ import openpyxl
 
 def preprocess(file, num_sheets):
   dfs_list = []
-  for i in range(num_sheets+1):
+  for i in range(1, num_sheets+1):
     try:
       mid_dat = pd.read_excel(file, sheet_name=i, header=1)
       num_rows = mid_dat['Assessment Date\n(DD/MM/YYYY)'].notna().sum()
@@ -55,7 +55,7 @@ def preprocess(file, num_sheets):
   general_data['Assessment Month'] = general_data['Assessment Date'].apply(lambda x : int(x.strftime('%m'))) 
   
   #Generate Sessions column
-  session_dict = {11: 'Fall', 10: 'Fall', 5 : 'Spring', 8 :'Summer'}
+  session_dict = {11: 'Fall', 10: 'Fall', 5 : 'Spring', 8 :'Summer', 2 : 'Winter', 1:'Winter', 3 : 'Winter'}
   general_data['Session'] = general_data['Assessment Month'].map(session_dict)
 
   #rearrange columns

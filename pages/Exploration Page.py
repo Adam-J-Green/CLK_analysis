@@ -117,6 +117,7 @@ if uploaded_file is not None:
             fig = plt.figure()
             for i, col in enumerate(selected_cols):
                 sns.histplot(hist_data[col], color=colours[i], kde = True, multiple = 'stack')
+            
             plt.title('Figure 1: Distribution of Evaluation Scores Across Programs') 
             plt.xlabel('Score')
             fig.legend(selected_cols)
